@@ -1,4 +1,4 @@
-import type { AnyPgColumn } from "drizzle-orm/pg-core";
+import { relations } from 'drizzle-orm/_relations';
 import * as t from "drizzle-orm/pg-core";
 
 export const users = t.pgTable(
@@ -76,3 +76,38 @@ export const verifications = t.pgTable(
 	},
 	(table) => [t.index('verifications_identifier_idx').on(table.identifier)],
 );
+
+export const usersRelations = relations(users, ({ many }) => ({
+	sessions: many(sessions),
+	accounts: many(accounts),
+}));
+
+export const sessionsRelations = relations(sessions, ({ one }) => ({
+	user: one(users, { fields: [sessions.userId], references: [users.id] }),
+}));
+
+export const accountsRelations = relations(accounts, ({ one }) => ({
+	user: one(users, { fields: [accounts.userId], references: [users.id] }),
+}));
+
+const schemaTables = {
+	users,
+	sessions,
+	accounts,
+	verifications,
+};
+
+export const Schema = schemaTables;
+export type Schema = typeof schemaTables;
+
+export const Relations = {
+	usersRelations,
+	sessionsRelations,
+	accountsRelations,
+};
+
+export const DbSchema = {
+	...Schema,
+	...Relations,
+};
+export type DbSchema = typeof DbSchema;

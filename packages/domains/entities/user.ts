@@ -12,10 +12,3 @@ export type User = {
 	updatedAt: Date;
 	deletedAt?: Date | null;
 };
-
-export type UserSearch = {
-	name?: string;
-	email?: string;
-	firstName?: string;
-	lastName?: string;
-};

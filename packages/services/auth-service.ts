@@ -1,6 +1,6 @@
 import { auth as Auth } from "../../app/src/lib/auth"; // path to your Better Auth server instance
 import type { SignInRequest, SignUpRequest } from '../domains/dto/user';
-//import type { UserRepository } from '../repositories/user-repo';
+//import type { UserRepository } from '@repositories';
 
 
 export class AuthService {
