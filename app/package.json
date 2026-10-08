@@ -8,8 +8,8 @@
   "dependencies": {
     "elysia": "latest"
   },
+  "module": "src/index.js",
   "devDependencies": {
-    "bun-types": "latest"
-  },
-  "module": "src/index.js"
+    "drizzle-kit": "1.0.0-rc.5-ab785fc"
+  }
 }

@@ -11,8 +11,13 @@ export const users = t.pgTable(
 	email: t.text('email').notNull().unique(),
 	emailVerified: t.boolean('email_verified').default(false).notNull(),
 	role: t.text('role').default('user'),
-  image: t.text('image'),
-  createdAt: t.timestamp('created_at').notNull(),
+	company: t.text('company'),
+	isActive: t.boolean('is_active').default(true).notNull(),
+	image: t.text('image'),
+	banned: t.boolean('banned').default(false).notNull(),
+	banReason: t.text('ban_reason'),
+	banExpires: t.timestamp('ban_expires'),
+	createdAt: t.timestamp('created_at').notNull(),
 	updatedAt: t.timestamp('updated_at')
 		.$onUpdate(() => new Date())
 		.notNull(),
@@ -27,6 +32,7 @@ export const sessions = t.pgTable(
 		token: t.text('token').notNull().unique(),
 		ipAddress: t.text('ip_address'),
 		userAgent: t.text('user_agent'),
+		impersonatedBy: t.text('impersonated_by'),
 		userId: t.text('user_id')
 			.notNull()
 			.references(() => users.id, { onDelete: 'cascade' }),

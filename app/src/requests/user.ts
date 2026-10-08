@@ -46,23 +46,6 @@ export const changePasswordRequest = t.Object(
 	},
 );
 
-export const resetPasswordRequest = t.Object(
-	{
-		userId: t.String(),
-		newPassword: t.String({ minLength: 8 }),
-		confirmNewPassword: t.String({ minLength: 8 }),
-	},
-	{
-		examples: [
-			{
-				userId: '123',
-				newPassword: 'newpassword123',
-				confirmNewPassword: 'newpassword123',
-			},
-		],
-	},
-);
-
 export const userStatusRequest = t.Object(
 	{
 		isActive: t.Boolean({ default: true }),

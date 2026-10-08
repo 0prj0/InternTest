@@ -1,3 +1,5 @@
+import type { UserRole } from '../entities/user';
+
 export type SignInRequest = {
 	email: string;
 	password: string;
@@ -8,6 +10,34 @@ export type SignUpRequest = {
 	email: string;
 	password: string;
 	confirmPassword: string;
-	firstName?: string;
-	lastName?: string;
+	firstName: string;
+	lastName: string;
+	company: string;
 };
+
+export type ChangeUserPasswordRequest = {
+	currentPassword: string;
+	newPassword: string;
+	confirmNewPassword: string;
+};
+
+export type UpdateUserRequest = {
+	firstName: string;
+	lastName: string;
+	image: string;
+};
+
+export type UserStatusRequest = {
+	isActive: boolean;
+	banReason: string;
+};
+
+export type CreateUserRequest = {
+	firstName: string;
+	lastName: string;
+	email: string;
+	company: string;
+	role: UserRole;
+	password: string;
+	confirmPassword: string;
+}

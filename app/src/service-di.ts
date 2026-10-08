@@ -1,10 +1,10 @@
 import { auth } from './lib/auth';
 import { UserRepository } from '../../packages/repositories';
-import { AuthService } from '../../packages/services/auth-service'; //, UserService
+import { AuthService, UserService } from '../../packages/services'; //, UserService
 
 const userRepository = new UserRepository();
 
-const authService = new AuthService(auth); //, userRepository
-// const userService = new UserService(auth, userRepository);
+const authService = new AuthService(auth, userRepository);
+const userService = new UserService(auth, userRepository);
 
-export { authService }; //, userService
+export { authService, userService }; //, userService
