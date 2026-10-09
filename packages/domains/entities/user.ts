@@ -9,7 +9,7 @@ export type User = {
 	email: string;
 	emailVerified: boolean;
 	image?: string | null;
-	company: string;
+	company: string | null;
 	role: UserRole;
 	status: boolean;
 	banned?: boolean | null;

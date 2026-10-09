@@ -18,7 +18,11 @@ export class AuthService {
 
 		const firstName = input.firstName?.trim() ?? '';
 		const lastName = input.lastName?.trim() ?? '';
-		const name = `${firstName} ${lastName}`.trim();
+		const company = input.company?.trim() ?? '';
+        if (!company) {
+            throw new Error('Company cannot be blank');
+        }
+        const name = `${firstName} ${lastName}`.trim();
 		if (!name) {
 			throw new Error('First name and last name cannot both be blank');
 		}
@@ -37,6 +41,7 @@ export class AuthService {
 				name,
 				firstName,
 				lastName,
+				company,
 			});
 			if (!user) {
 				throw new Error('Created user could not be updated');
@@ -117,6 +122,10 @@ export class AuthService {
 
         const firstName = input.firstName?.trim() ?? '';
         const lastName = input.lastName?.trim() ?? '';
+        const company = input.company?.trim() ?? '';
+        if (!company) {
+            throw new Error('Company cannot be blank');
+        }
         const name = `${firstName} ${lastName}`.trim();
         if (!name) {
             throw new Error('First name and last name cannot both be blank');
@@ -139,6 +148,7 @@ export class AuthService {
                 name,
                 firstName,
                 lastName,
+                company,
                 role: input.role ?? 'user',
                 isActive: true,
             });

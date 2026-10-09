@@ -73,6 +73,9 @@ export class UserService {
 		if (!sessionUser) {
 			throw new Error('Session user not found');
 		}
+		if (!sessionUser.status || sessionUser.role !== 'admin') {
+			throw new Error('Only active administrators can perform this action');
+		}
 		//Check if user exists
 		const user = await this.userRepo.findById(id);
 		if (!user) {
@@ -116,6 +119,9 @@ export class UserService {
 		const sessionUser = await this.userRepo.findById(sessionUserId);
 		if (!sessionUser) {
 			throw new Error('Session user not found');
+		}
+		if (!sessionUser.status || sessionUser.role !== 'admin') {
+			throw new Error('Only active administrators can perform this action');
 		}
 		//Delete user
 		try {

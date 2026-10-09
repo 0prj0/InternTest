@@ -83,6 +83,7 @@ export const createUserRequest = t.Object(
 		}),
 		firstName: t.String({ minLength: 1 }),
 		lastName: t.String({ minLength: 1 }),
+		company: t.String({ minLength: 1 }),
 		role: t.Union([t.Literal('user'), t.Literal('admin')])
 	},
 	{

@@ -8,10 +8,9 @@ import {
 	type UserRole,
 } from '../domains';
 import { buildPagingResult } from '../domains/helpers';
-import { and, count, eq, ilike, isNull } from 'drizzle-orm';
+import { and, count, eq, isNull } from 'drizzle-orm';
 
 type UserQueryRow = typeof Schema.users.$inferSelect;
-type UserSearch = Partial<Pick<User, 'name' | 'email' | 'firstName' | 'lastName'>>;
 
 export class UserRepository {
 	private readonly table = Schema.users;
@@ -67,21 +66,10 @@ export class UserRepository {
 	async findAll(
 		paging: PagingParams,
 		ordering: OrderingParams<User>,
-		search?: UserSearch,
 		options?: DatabaseOptions,
 	): Promise<PagingResult<User>> {
 		const db = getDatabaseContext(options);
-		const whereClause = and(
-			isNull(this.table.deletedAt),
-			search?.name ? ilike(this.table.name, `%${search.name}%`) : undefined,
-			search?.email ? ilike(this.table.email, `%${search.email}%`) : undefined,
-			search?.firstName
-				? ilike(this.table.firstName, `%${search.firstName}%`)
-				: undefined,
-			search?.lastName
-				? ilike(this.table.lastName, `%${search.lastName}%`)
-				: undefined,
-		);
+		const whereClause = isNull(this.table.deletedAt);
 		const orderByKey =
 			ordering.orderBy as keyof typeof Schema.users.$inferSelect;
 		const isAsc = ordering.orderDirection === ORDER_DIRECTION.ASC;
@@ -90,14 +78,6 @@ export class UserRepository {
 			db.query.users.findMany({
 				where: {
 					deletedAt: { isNull: true },
-					...(search?.name && { name: { ilike: `%${search.name}%` } }),
-					...(search?.email && { email: { ilike: `%${search.email}%` } }),
-					...(search?.firstName && {
-						firstName: { ilike: `%${search.firstName}%` },
-					}),
-					...(search?.lastName && {
-						lastName: { ilike: `%${search.lastName}%` },
-					}),
 				},
 				orderBy: (users, { asc, desc }) =>
 					isAsc ? asc(users[orderByKey]) : desc(users[orderByKey]),

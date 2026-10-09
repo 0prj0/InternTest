@@ -37,7 +37,6 @@ export const userRoute = new Elysia({
 				return { error: 'Unauthorized' };
 			}
 
-			const { name, email, firstName, lastName } = query;
 			const paging = {
 				page: Number(query.page),
 				perPage: Number(query.perPage),
@@ -45,12 +44,6 @@ export const userRoute = new Elysia({
 			const order: OrderingParams<User> = {
 				orderBy: query.orderBy as keyof User,
 				orderDirection: query.orderDirection as OrderDirection,
-			};
-			const search = {
-				name,
-				email,
-				firstName,
-				lastName,
 			};
 			const users = await userService.getAllUsers(paging, order);
 			return users;
@@ -81,6 +74,11 @@ export const userRoute = new Elysia({
 				return { error: 'Unauthorized' };
 			}
 
+			if (user.role !== 'admin') {
+				set.status = 403;
+				return { error: 'Only administrators can perform this action' };
+			}
+
 			return userService.updateUser(
 				params.id,
 				body as UpdateUserRequest,
@@ -98,6 +96,11 @@ export const userRoute = new Elysia({
 			if (!user) {
 				set.status = 401;
 				return { error: 'Unauthorized' };
+			}
+
+			if (user.role !== 'admin') {
+				set.status = 403;
+				return { error: 'Only administrators can perform this action' };
 			}
 
 			await userService.deleteUser(params.id, user.id);
