@@ -28,38 +28,3 @@ export const updateUserRequest = t.Object(
 		],
 	},
 );
-
-export const changePasswordRequest = t.Object(
-	{
-		currentPassword: t.String({ minLength: 1 }),
-		newPassword: t.String({ minLength: 8 }),
-		confirmNewPassword: t.String({ minLength: 8 }),
-	},
-	{
-		examples: [
-			{
-				currentPassword: 'password123',
-				newPassword: 'newpassword123',
-				confirmNewPassword: 'newpassword123',
-			},
-		],
-	},
-);
-
-export const userStatusRequest = t.Object(
-	{
-		isActive: t.Boolean({ default: true }),
-		banReason: t.Optional(t.String()),
-	},
-	{
-		examples: [
-			{
-				isActive: true,
-			},
-			{
-				isActive: false,
-				banReason: 'This user is spamming',
-			},
-		],
-	},
-);
