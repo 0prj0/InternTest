@@ -1,11 +1,14 @@
-import type { OrderDirection, OrderingParams, User } from '../../../packages/domains';
+import type {
+	OrderDirection,
+	OrderingParams,
+	UpdateUserRequest,
+	User,
+} from '../../../packages/domains';
 import { Elysia } from 'elysia';
 import {
-	changePasswordRequest,
 	listUsersQuery,
 	updateUserRequest,
 	userIdParams,
-	userStatusRequest,
 } from '../requests/user';
 import { userService } from '../service-di';
 import { auth } from '../lib/auth';
@@ -78,7 +81,11 @@ export const userRoute = new Elysia({
 				return { error: 'Unauthorized' };
 			}
 
-			return userService.updateUser(params.id, body, user.id);
+			return userService.updateUser(
+				params.id,
+				body as UpdateUserRequest,
+				user.id,
+			);
 		},
 		{
 			params: userIdParams,
@@ -111,26 +118,3 @@ export const userRoute = new Elysia({
 			params: userIdParams,
 		},
 	)
-	// .post(
-	// 	'/reset-password',
-	// 	async ({ body, user, request: { headers } }) =>
-	// 		userService.resetUserPassword(body, user.id, headers),
-	// 	{
-	// 		body: resetPasswordRequest,
-	// 	},
-	// )
-	.patch(
-		'/:id/status',
-		async ({ params, body, user, set }) => {
-			if (!user) {
-				set.status = 401;
-				return { error: 'Unauthorized' };
-			}
-
-			return userService.updateUserStatus(params.id, body, user.id);
-		},
-		{
-			params: userIdParams,
-			body: userStatusRequest,
-		},
-	);
