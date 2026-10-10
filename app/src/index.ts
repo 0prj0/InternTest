@@ -2,13 +2,19 @@ import { Elysia } from "elysia";
 import cors from "@elysiajs/cors";
 import openapi from "@elysiajs/swagger"; // Note: OpenAPI in Elysia is powered by @elysiajs/swagger
 import { auth } from "./lib/auth";
-import { logger } from "../../packages/domains/utils";
+import { HttpError, logger } from "../../packages/domains/utils";
 import { authRoute } from "./routers/auth-route"; // fixed import path
 import { userRoute } from "./routers/user-route";
 import { config } from "../../packages/infra";
 
 const app = new Elysia()
-  // ── Request logging ───────────────────────────────────────────────────────
+  .onError(({ error, set }) => {
+    if (error instanceof HttpError) {
+      set.status = error.statusCode;
+      return { error: error.message };
+    }
+  })
+  // โ”€โ”€ Request logging โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€
   .onRequest(({ request }) => {
     logger.info(
       { method: request.method, url: request.url },
@@ -16,7 +22,7 @@ const app = new Elysia()
     );
   })
 
-  // ── CORS ──────────────────────────────────────────────────────────────────
+  // โ”€โ”€ CORS โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€
   .use(
     cors({
       origin: config.AUTH_TRUSTED_ORIGINS,
@@ -25,7 +31,7 @@ const app = new Elysia()
     })
   )
 
-  // ── OpenAPI docs ──────────────────────────────────────────────────────────
+  // โ”€โ”€ OpenAPI docs โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€
   .use(
     openapi({
       documentation: {
@@ -43,13 +49,13 @@ const app = new Elysia()
     })
   )
 
-  // ── Better Auth handler ───────────────────────────────────────────────────
+  // โ”€โ”€ Better Auth handler โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€
   .mount(auth.handler)
 
-  // ── API routes ────────────────────────────────────────────────────────────
+  // โ”€โ”€ API routes โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€
   .group("/api/v1", (app) => app.use([authRoute, userRoute]))
 
-  // ── Health check ──────────────────────────────────────────────────────────
+  // โ”€โ”€ Health check โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€โ”€
   .get("/health", () => ({ status: "ok", timestamp: new Date().toISOString() }))
   .listen(config.PORT);
 

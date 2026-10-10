@@ -1,9 +1,7 @@
 import { auth as Auth } from "../../app/src/lib/auth";
 import type { UserRepository } from '../repositories';
 import type {
-	ChangeUserPasswordRequest,
 	UpdateUserRequest,
-	UserStatusRequest,
 } from '../domains/dto';
 import type {
 	OrderingParams,
@@ -12,7 +10,7 @@ import type {
 	SuccessResponse,
 	User,
 } from '../domains/entities';
-import { logger } from '../domains/utils';
+import { HttpError, logger } from '../domains/utils';
 
 export class UserService {
 	constructor(
@@ -26,17 +24,18 @@ export class UserService {
         try {
             user = await this.userRepo.findById(id);
             if (!user) {
-                throw new Error('User not found');
+                throw new HttpError(404, 'User not found');
             }
             return user;
         } catch (error: unknown) {
+			if (error instanceof HttpError) throw error;
             const err = error as {
 				statusCode?: number;
 				status?: number;
 				message?: string;
 			};
             logger.error(error, 'GetUserById error');
-            throw new Error('Failed to get user by id');
+            throw new HttpError(500, 'Failed to get user by id');
         }
     }
 
@@ -48,13 +47,14 @@ export class UserService {
 			const users = await this.userRepo.findAll(paging, ordering);
 			return users;
 		} catch (error: unknown) {
+			if (error instanceof HttpError) throw error;
 			const err = error as {
 				statusCode?: number;
 				status?: number;
 				message?: string;
 			};
 			logger.error(error, 'GetAllUsers error');
-			throw new Error(err?.message ?? 'Failed to get all users',);
+			throw new HttpError(500, 'Failed to get all users');
 		}
 	}
 
@@ -71,15 +71,15 @@ export class UserService {
 		//Check if session user exists
 		const sessionUser = await this.userRepo.findById(sessionUserId);
 		if (!sessionUser) {
-			throw new Error('Session user not found');
+			throw new HttpError(401, 'Session user not found');
 		}
 		if (!sessionUser.status || sessionUser.role !== 'admin') {
-			throw new Error('Only active administrators can perform this action');
+			throw new HttpError(403, 'Only active administrators can perform this action');
 		}
 		//Check if user exists
 		const user = await this.userRepo.findById(id);
 		if (!user) {
-			throw new Error('User not found');
+			throw new HttpError(404, 'User not found');
 		}
 		const updateData: UpdateUserRequest & { name?: string } = { ...data };
 		if ('firstName' in data || 'lastName' in data) {
@@ -87,7 +87,7 @@ export class UserService {
 			const lastName = data.lastName ?? user.lastName ?? '';
 			const name = `${firstName} ${lastName}`.trim();
 			if (!name) {
-				throw new Error('First name and last name cannot both be blank');
+				throw new HttpError(400, 'First name and last name cannot both be blank');
 			}
 			updateData.name = name;
 		}
@@ -95,45 +95,49 @@ export class UserService {
 		try {
 			const updatedUser = await this.userRepo.update(id, updateData);
 			if (!updatedUser) {
-				throw new Error('User not found');
+				throw new HttpError(404, 'User not found');
 			}
 			return updatedUser;
 		} catch (error: unknown) {
+			if (error instanceof HttpError) throw error;
 			const err = error as {
 				statusCode?: number;
 				status?: number;
 				message?: string;
 			};
 			logger.error(error, 'UpdateUser error');
-			throw new Error(err?.message ?? 'Failed to update user',);
+			throw new HttpError(500, 'Failed to update user');
 		}
 	}
 
-    async deleteUser(id: string, sessionUserId: string): Promise<void> {
+    async deleteUser(id: string, sessionUserId: string): Promise<{ deletedSelf: boolean }> {
 		//Check if user exists
 		const user = await this.userRepo.findById(id);
 		if (!user) {
-			throw new Error('User not found');
+			throw new HttpError(404, 'User not found');
 		}
 		//Check if session user exists
 		const sessionUser = await this.userRepo.findById(sessionUserId);
 		if (!sessionUser) {
-			throw new Error('Session user not found');
+			throw new HttpError(401, 'Session user not found');
 		}
 		if (!sessionUser.status || sessionUser.role !== 'admin') {
-			throw new Error('Only active administrators can perform this action');
+			throw new HttpError(403, 'Only active administrators can perform this action');
 		}
 		//Delete user
 		try {
 			await this.userRepo.delete(id, sessionUserId);
+			// Service โ€” after deletion succeeds
+			return { deletedSelf: id === sessionUserId };
 		} catch (error: unknown) {
+			if (error instanceof HttpError) throw error;
 			const err = error as {
 				statusCode?: number;
 				status?: number;
 				message?: string;
 			};
 			logger.error(error, 'DeleteUser error');
-			throw new Error(err?.message ?? 'Failed to delete user',);
+			throw new HttpError(500, 'Failed to delete user');
 		}
 	}
 }

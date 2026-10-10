@@ -125,9 +125,9 @@ export const userRoute = new Elysia({
 				return { error: 'Only administrators can perform this action' };
 			}
 
-			await userService.deleteUser(params.id, user.id);
+			const result = await userService.deleteUser(params.id, user.id);
 
-			if (params.id === user.id) {
+			if (result.deletedSelf) {
 				const signOutResponse = await auth.api.signOut({
 					headers: request.headers,
 					asResponse: true,
