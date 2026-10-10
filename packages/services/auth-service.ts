@@ -120,6 +120,14 @@ export class AuthService {
             throw new Error('Unauthorized: Only administrators can perform this action');
         }
 
+        const adminUser = await this.userRepo.findById(session.user.id);
+        if (!adminUser || !adminUser.status || adminUser.role !== 'admin') {
+            throw new Error('Only active administrators can perform this action');
+        }
+        if (input.password !== input.confirmPassword) {
+            throw new Error('Password and confirmPassword do not match');
+        }
+
         const firstName = input.firstName?.trim() ?? '';
         const lastName = input.lastName?.trim() ?? '';
         const company = input.company?.trim() ?? '';

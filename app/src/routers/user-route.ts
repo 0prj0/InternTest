@@ -10,7 +10,8 @@ import {
 	updateUserRequest,
 	userIdParams,
 } from '../requests/user';
-import { userService } from '../service-di';
+import { authService, userService } from '../service-di';
+import { createUserRequest } from '../requests/auth';
 import { auth } from '../lib/auth';
 
 export const userRoute = new Elysia({
@@ -29,6 +30,27 @@ export const userRoute = new Elysia({
 
         return { user };
     })
+	.post(
+		'/',
+		async ({ body, user, request, set }) => {
+			if (!user) {
+				set.status = 401;
+				return { error: 'Unauthorized' };
+			}
+			if (user.role !== 'admin') {
+				set.status = 403;
+				return { error: 'Only administrators can perform this action' };
+			}
+			if (body.password !== body.confirmPassword) {
+				set.status = 400;
+				return { error: 'Password and confirmPassword do not match' };
+			}
+			const createdUser = await authService.createUserByAdmin(body, request.headers);
+			set.status = 201;
+			return createdUser;
+		},
+		{ body: createUserRequest },
+	)
 	.get(
 		'/',
 		async ({ query, user, set }) => {

@@ -15,21 +15,14 @@ export type SignUpRequest = {
 	company: string;
 };
 
-export type ChangeUserPasswordRequest = {
-	currentPassword: string;
-	newPassword: string;
-	confirmNewPassword: string;
-};
-
 export type UpdateUserRequest = {
 	firstName: string;
 	lastName: string;
-	image: string;
-};
-
-export type UserStatusRequest = {
-	isActive: boolean;
-	banReason: string;
+	email: string;
+	company: string;
+	role: UserRole;
+	password: string;
+	confirmPassword: string;
 };
 
 export type CreateUserRequest = {

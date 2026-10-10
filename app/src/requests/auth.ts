@@ -92,6 +92,7 @@ export const createUserRequest = t.Object(
 				firstName: 'John',
 				lastName: 'Doe',
 				email: 'user@example.com',
+				company: 'Abc',
 				role: 'user',
 				password: 'AaBb12345!',
 				confirmPassword: 'AaBb12345!',
